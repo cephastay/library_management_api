@@ -1,0 +1,52 @@
+Table Users {
+  user_id pk [increment]
+  username varchar [null, note: 'case insensitive']
+  email email [unique, note: 'case insensitive']
+  bio varchar [note:'max_length 500']
+}
+
+Table LibraryProfile {
+  role_id pk [increment]
+  role choices [unique, note: 'member|librarian']
+  user_id int [ref: - Users.user_id, unique]
+  member_since datetime 
+}
+
+Table Book {
+  book_id pk [increment] 
+  title varchar [unique, note: 'max_length 150']
+  author varchar [note: 'max_length 75']
+  ISBN varchar [unique, note: 'ISBN format supported']
+}
+
+Table Book_Info {
+  book_id pk [ref: - Book.book_id, unique]
+  copies int [note: 'default: 0']
+  date_added datetime
+  status bool [note: 'default: False']
+}
+
+Table CheckOut {
+  id pk [increment]
+  book_id int [ref: > Book.book_id]
+  user_id int [ref: > Users.user_id]
+  status choices [note: 'pending|missing|returned|overdue']
+  checkout_date datetime [default: "datetime.now()"]
+  due_date datetime [note: 'set 14 days from checkout date']
+  // return_date datetime [null]
+  // Ensures a user cannot check out the same book twice concurrently
+  indexes {
+    (book_id, user_id) [unique]
+  }
+}
+
+Table Archived_CheckOut {
+  id pk [increment]
+  book_id int //[ref: > Book.book_id]
+  user_id int //[ref: > User.user_id]
+  checkout_date datetime
+  return_date datetime 
+  indexes {
+  (book_id, user_id) [unique]
+  }
+}
