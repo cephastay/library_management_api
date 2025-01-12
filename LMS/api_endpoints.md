@@ -22,9 +22,9 @@ Below is the list of endpoints that are available in the Library Management Syst
 
 | METHOD | ROUTE | FUNCTIONALITY | ACCESS |
 |--------|-------|---------------|--------|
-| *POST* | `/api/auth/jwt/create/` | _Retrieve jwt token_ | _All users_ |
-| *POST* | `/api/auth/jwt/refresh/` | _Refresh the jwt access token_ | _Authenticated Users_ |
-| *POST* | `/api/auth/jwt/verify/` | _Verify the validity of a jwt token_ | _Authenticated Users_ |
+| *POST* | `/api/token/jwt/create/` | _Retrieve jwt token_ | _All users_ |
+| *POST* | `/api/token/jwt/refresh/` | _Refresh the jwt access token_ | _Authenticated Users_ |
+| *POST* | `/api/token/jwt/verify/` | _Verify the validity of a jwt token_ | _Authenticated Users_ |
 | *POST* | `/api/token/basic/` | _Retrieve basic rest framework token_ | _Authenticated Users_ |
 
 ---
@@ -34,9 +34,10 @@ Below is the list of endpoints that are available in the Library Management Syst
 | METHOD | ROUTE | FUNCTIONALITY | ACCESS |
 |--------|-------|---------------|--------|
 | *GET*  | `/api/books/` | _Retrieve All Books_ | _All users_ |
-| *GET*  | `/api/books/available/` | _Retrieve Available Books for checkout_ | _Authenticated users_ |
 | *GET*  | `/api/books/{book_id}/` | _Retrieve Specific Book Details_ | _All Users_ |
 | *POST* | `/api/books/` | _Create Book Instance_ | _Admin Users_ |
+| *POST* | `/api/books/{book_id}/checkout/` | _Borrow the Book Specified by ID_ | _Authenticated Users_ |
+| *POST* | `/api/books/{book_id}/return/` | _Return the Book Borrowed by Book ID_ | _Owner or Admin_ |
 | *PUT*  | `/api/books/{book_id}/` | _Edit/ Update Book Details_ | _Admin_ |
 | *PATCH* | `/api/books/{book_id}/` | _Partial Edit/ Update Book Details_ | _Admin User_ |
 | *DELETE* | `/api/books/{book_id}/` | _Delete Book_ | _Admin User_ |
@@ -49,10 +50,16 @@ Below is the list of endpoints that are available in the Library Management Syst
 |--------|-------|---------------|--------|
 | *GET*  | `/api/checkout/` | _Books Checked Out by User (Status Pending)_ | _Owner or Admin_ |
 | *GET*  | `/api/checkout/` | _Books Checked Out by All Users (Status Pending)_ | _Admin_ |
-| *GET*  | `/api/history/` | _User CheckOut History_ | _Admin or Owner_ |
-| *GET*  | `/api/checkout/{book_id}/checkout/` | _CheckOut Available Book_ | _Authenticated Users_ |
-| *GET*  | `/api/checkout/{book_id}/return/` | _Return Borrowed Book_ | _Authenticated Users_ |
-| *POST* | `/api/checkout/{book_id}/checkout/` | _CheckOut Available Book_ | _Authenticated Users_ |
+| *GET*  | `/api/checkout_history/` | _User CheckOut History_ | _Admin or Owner_ |
+| *POST* | `/api/checkout/` | _CheckOut Available Book_ | _Authenticated Users_ |
 | *POST* | `/api/checkout/{book_id}/return/` | _Return a checked out Book_ | _Authenticated Users_ |
 
+## OTHER ROUTES
+
+| METHOD | ROUTE | FUNCTIONALITY | ACCESS |
+|--------|-------|---------------|--------|
+| *GET*  | `/api/docs/` | _View API Documentation SWAGGER UI_ | _All Users_ |
+| *GET* | `/api/redoc/` | _View API Documentation Swagger Redoc_ | _All Users_ |
+| *GET* | `/api/endpoints/` | _Available API Endpoints in JSON_ | _All Users_ |
+| *GET* | `/api/admin/` | _Access Django Admin Page_ | _Admin_ |
 ---

@@ -12,6 +12,8 @@ from api.models import Book, BookInfo, CheckOut, ArchivedCheckOut
 from utils.custom_permissions import IsOwnerOrAdmin
 from django.contrib.auth import get_user_model
 
+from drf_yasg.utils import swagger_auto_schema
+
 User = get_user_model()
 
 @api_view(['GET'])
@@ -22,27 +24,29 @@ def endpoints(request):
     """
     end_points = {
     'users-list': 'api/users/',  # List all users
-    'user-detail': 'api/users/<int:pk>/',  # User detail by ID
-    'user-create': 'api/users/',  # Create a new user
-    'user-delete': 'api/users/<int:pk>/',  # Delete a user by ID
-    'user-change_password': 'api/users/<int:pk>/change_password/',  # Change user's password
-    'basic-token': 'api/auth/basic/',  # Basic authentication token
-    'jwt-token-create': 'api/auth/jwt/',  # JWT token create
-    'jwt-token-verify': 'api/auth/jwt/verify/',  # JWT token verify
-    'jwt-token-refresh': 'api/auth/jwt/refresh/',  # JWT token refresh
+    'user-detail': 'api/users/<int:pk>/',  
+    'user-create': 'api/users/',  
+    'user-delete': 'api/users/<int:pk>/',  
+    'user-change_password': 'api/users/<int:pk>/change_password/', 
+    
+    'basic-token': 'api/token/basic/',  # Basic authentication token
+    'jwt-token-create': 'api/token/jwt/',  # JWT token create
+    'jwt-token-verify': 'api/token/jwt/verify/',  # JWT token verify
+    'jwt-token-refresh': 'api/token/jwt/refresh/',  # JWT token refresh
+
     'book-list': 'api/books/',  # List all books
-    'book-detail': 'api/books/<int:pk>/',  # Book detail by ID
-    'book-info-list': 'api/book/info/',  # List all book information
-    'book-info-detail': 'api/book/info/<int:pk>/',  # Book information detail by ID
-    'checkout-list': 'api/checkout/',  # List all checkouts
-    'checkout-detail': 'api/checkout/<int:pk>/',  # Checkout detail by ID
+    'book-detail': 'api/books/<int:pk>/',
+    'book-info-list': 'api/booksinfo/',  # List all book information
+    'book-info-detail': 'api/booksinfo/<int:pk>/',  # Book information detail by ID
+    'borrow-book': 'api/books/<int:pk>/checkout/',  #Borrow Book by ID
+    'return-book': 'api/books/<int:pk>/return/', #Return Book by Id
+
+    'checkout-list': 'api/checkout/',  # List all active checkouts
+    'checkout-detail': 'api/checkout/<int:pk>/',  
     'checkout-return': 'api/checkout/<int:pk>/return_book/',  # Return books, pk field is the id of the book
-    'history-list': 'api/history/',  # List all history entries
-    'history-detail': 'api/history/<int:pk>/',  # History detail by ID
-    'endpoints': 'api/endpoints/',  # Get all API endpoints
-    'api-root': 'api/',  # API root
-    'return-book': 'api/books/<int:pk>/return/',  # Return a borrowed book
-    'borrow-book': 'api/books/<int:pk>/checkout/',  # Checkout a book
+
+    'history-list': 'api/checkout_history/',  #list user checkout history
+    'endpoints': 'api/endpoints/', 
 }
 
     return Response(end_points, status=status.HTTP_200_OK)
@@ -58,6 +62,7 @@ class BookViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.OrderingFilter, filters.SearchFilter]
     filterset_fields = ['author', 'published_date']
     search_fields = ['title', 'author', 'ISBN']
+    ordering_fields = ['published_date']
 
     def get_queryset(self):
         if self.request.method == 'GET':
@@ -78,9 +83,10 @@ class BookViewSet(viewsets.ModelViewSet):
             status=status.HTTP_204_NO_CONTENT
         )
 
+
 class BookInfoViewSet(viewsets.ModelViewSet):
     """
-    A viewset for managing BookInfo instances.
+    A view for managing extra information about Books in the database.
     """
     serializer_class = BookInfoSerializer
     queryset = BookInfo.objects.all()
@@ -90,6 +96,18 @@ class BookInfoViewSet(viewsets.ModelViewSet):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             self.permission_classes = [permissions.IsAdminUser]
         return super().get_permissions()
+    
+    @swagger_auto_schema(auto_schema=None)
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+    
+    @swagger_auto_schema(auto_schema=None)
+    def destroy(self, request, *args, **kwargs):
+        return super().destroy(request, *args, **kwargs)
+    
+    @swagger_auto_schema(auto_schema=None)
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 
 class CheckOutViewSet(viewsets.ModelViewSet):
@@ -110,6 +128,18 @@ class CheckOutViewSet(viewsets.ModelViewSet):
         elif self.action == 'return_book':
             self.permission_classes = [IsOwnerOrAdmin]
         return super().get_permissions()
+    
+    @swagger_auto_schema(auto_schema=None)
+    def update(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)
+    
+    @swagger_auto_schema(auto_schema=None)
+    def partial_update(self, request, *args, **kwargs):
+        return super().partial_update(request, *args, **kwargs)
+    
+    @swagger_auto_schema(auto_schema=None)
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
 
     def get_queryset(self):
         if self.request.user.is_staff:
@@ -117,7 +147,7 @@ class CheckOutViewSet(viewsets.ModelViewSet):
         if self.request.user.is_authenticated:
             return self.queryset.filter(user=self.request.user)
         return self.queryset.none()
-
+    
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()  # Get the instance to be deleted
         self.perform_destroy(instance)  # Perform the deletion
@@ -130,18 +160,21 @@ class CheckOutViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['get', 'post'], url_name='return', permission_classes=[IsOwnerOrAdmin, permissions.IsAuthenticated])
     def return_book(self, request, pk=None):
         """
-        Handle book returns.
-            """
+        Handle book returns. The id supplied is that of the Book that was 
+        Borrowed Instead of the checkout id. If a checkout exists for that 
+        book by the user making the request then they can return the book.
+        """
         try:
             # Retrieve the book instance
             book = Book.objects.get(id=pk)
+
             # Retrieve the checkout instance for the specific user and book
             checkout = CheckOut.objects.filter(book__id=book.pk, user__email=request.user.email).get()
         except CheckOut.DoesNotExist:
             return Response({"error": "Checkout record not found."}, status=status.HTTP_404_NOT_FOUND)
 
         if request.method == 'GET':
-            # Serialize the checkout data
+            # Serialize the checkout data that was retrieved
             serializer = self.serializer_class(checkout)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -151,17 +184,28 @@ class CheckOutViewSet(viewsets.ModelViewSet):
                 checkout.delete()
                 return Response({"detail": "Book already returned and record deleted."}, status=status.HTTP_200_OK)
 
-            # Mark the book as returned
+            # Mark the book as returned 
             checkout.return_book()  
             checkout.delete()
             return Response({"detail": "Borrowed book returned successfully."}, status=status.HTTP_200_OK)
 
-
+@swagger_auto_schema(
+        method='get',
+        operation_summary='Return a borrowed Book',
+        operation_description='View Information about Book to be returned',
+        responses={200:BookSerializer}
+)
+@swagger_auto_schema(
+    method='post',
+    operation_summary='Return a borrowed Book',
+    operation_description='Mark a borrowed book as returned and archive checkout',
+    responses={200: "Borrowed Book Returned Successfully."}
+)
 @api_view(['GET', 'POST'])
 @permission_classes([permissions.IsAuthenticated])
 def return_book(request, pk=None):
     """
-    Standalone view to return a borrowed book.
+    Standalone view to return a borrowed book. Takes the primary key of the book then finds a checkout instance per the user if it exists. Before proceeding to return the book.
     """
     try:
         book = Book.objects.get(pk=pk)
@@ -190,12 +234,24 @@ HTTP_404_NOT_FOUND)
         checkout.delete()
         return Response({"detail": "Borrowed Book returned successfully."}, status=status.HTTP_200_OK)
 
-
+@swagger_auto_schema(
+        method='get',
+        operation_summary='Borrow a Book',
+        operation_description='View Information about Book to be borrowed',
+        responses={200:BookSerializer}
+)
+@swagger_auto_schema(
+    method='post',
+    operation_summary='Borrow a Book',
+    operation_description='Checks if a Book is available checks it out.',
+    responses={201: CheckOutSerializer}
+)
 @api_view(['GET', 'POST'])
 @permission_classes([permissions.IsAuthenticated, IsOwnerOrAdmin])
 def borrow_book(request, pk=None):
     """
-    Standalone view to borrow a book.
+    Standalone view to borrow a book. Takes the id of the book and checks it's 
+    status. If the book is available then proceed to borrow the book. 
     """
     try:
         book = Book.objects.get(pk=pk)
@@ -218,7 +274,7 @@ def borrow_book(request, pk=None):
 
 class TransactionHistoryViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    A viewset for viewing transaction histories.
+    This view returns the checkout history of an authenticated user.
     """
     serializer_class = TransactionHistorySerializer
     queryset = ArchivedCheckOut.objects.all().order_by('-return_date')
@@ -228,3 +284,7 @@ class TransactionHistoryViewSet(viewsets.ReadOnlyModelViewSet):
         if self.request.user.is_staff:
             return self.queryset
         return self.queryset.filter(user=self.request.user)
+    
+    @swagger_auto_schema(auto_schema=None)
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)

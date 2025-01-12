@@ -20,7 +20,7 @@ class Book(models.Model):
     ISBN: str = models.CharField(
         max_length=13,
         unique=True,
-        help_text="ISBN (10 or 13 characters)."
+        help_text="ISBN of the Book (10 or 13 characters)."
     )
     published_date: models.DateField = models.DateField(
         blank=True,
@@ -56,6 +56,7 @@ class Book(models.Model):
     class Meta:
         verbose_name = "Book"
         verbose_name_plural = "Books"
+        ordering = ['-published_date']
 
 
 class BookInfo(models.Model):
@@ -64,19 +65,19 @@ class BookInfo(models.Model):
         Book,
         on_delete=models.CASCADE,
         related_name='info',
-        help_text="Associated book."
+        help_text="Associated book whose information is stored."
     )
     copies: int = models.PositiveSmallIntegerField(
         default=0,
-        help_text="Number of available copies."
+        help_text="Number of available copies in Library."
     )
     date_added: models.DateTimeField = models.DateTimeField(
         auto_now_add=True,
-        help_text="Date added to inventory."
+        help_text="Date book was added to inventory."
     )
     status: bool = models.BooleanField(
         default=False,
-        help_text="Availability status."
+        help_text="Availability status of the Book."
     )
 
     def __str__(self) -> str:
@@ -129,17 +130,17 @@ class CheckOut(models.Model):
     )
     checkout_date = models.DateField(
         auto_now_add=True,
-        help_text="Checkout date."
+        help_text="Date book was checked out."
     )
     due_date = models.DateField(
         null=True,
         blank=True,
-        help_text='Due date for return.'
+        help_text='Date book should be returned.'
     )
     return_date = models.DateField(
         null=True,
         blank=True,
-        help_text='Return date.'
+        help_text='Date book was returned.'
     )
     status = models.CharField(
         max_length=20,
@@ -196,18 +197,18 @@ class ArchivedCheckOut(models.Model):
     book = models.ForeignKey(
         Book,
         on_delete=models.RESTRICT,
-        related_name='checkouts',
-        help_text='Archived book.'
+        related_name='bookcheckouthistory',
+        help_text='A book that was borrowed and returned.'
     )
     user = models.ForeignKey(
         get_user_model(),
         on_delete=models.RESTRICT,
-        related_name="user_checkouts",
-        help_text="User who borrowed the book."
+        related_name="usercheckouthistory",
+        help_text="User who borrowed the book and returned."
     )
     checkout_date = models.DateField(
-        help_text="Checkout date."
+        help_text="Date of book checkout."
     )
     return_date = models.DateField(
-        help_text='Return date.'
+        help_text='Date of book return.'
     )

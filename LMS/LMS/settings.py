@@ -6,8 +6,7 @@ from dj_database_url import parse as db_url
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config(
-    'SECRET_KEY', 
-    default='django-insecure-o$5e-cpdj620b#d%bclvks16n*$75x3!miit*aqq74h#f%5*d'
+    'SECRET_KEY'
 )
 
 # Determine the environment (default is development)
@@ -39,6 +38,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'djoser',
     'django_filters',
+    'drf_yasg'
 ]
 
 MIDDLEWARE = [
@@ -109,6 +109,13 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = 'static/'
 
+STATICFILES_DIR = [
+    BASE_DIR / "static"
+]
+
+STATIC_ROOT = BASE_DIR / "static/staticfiles"
+
+
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -126,7 +133,8 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
-    'EXCEPTION_HANDLER': 'utils.exceptionhandler.customexceptionhandler'
+    'EXCEPTION_HANDLER': 'utils.exceptionhandler.customexceptionhandler',
+
 }
 
 # JWT settings
@@ -137,3 +145,43 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': False,
     'ALGORITHM': 'HS256',
 }
+
+#swagger settings
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        # Basic Authentication
+        'Basic': {
+            'type': 'basic',  
+        },
+        # Bearer Token Authentication (JWT)
+        'Bearer': {
+            'type': 'apiKey',  
+            'name': 'Authorization',  
+            'in': 'header',  
+            'description': 'JWT token for user authentication',  
+        },
+        # Token Authentication (DRF token authentication)
+        'Token': {
+            'type': 'apiKey', 
+            'name': 'Authorization', 
+            'in': 'header',  
+            'description': 'Token for user authentication',  
+        }
+    },    
+}
+
+
+#added security for mock project
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SECURE_BROWSER_XSS_FILTER = True
+X_FRAME_OPTIONS = 'DENY'
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+if ENVIRONMENT == 'production' and DEBUG == False:
+    #ONLY USE IN DEPLOYMENT
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True  # Include subdomains in HSTS
+    SECURE_HSTS_PRELOAD = True  # Allow site to be preloaded by browsers
+    SECURE_PROXY_SSL_HEADER = "HTTP_X_FORWARDED_PROTO"

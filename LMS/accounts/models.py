@@ -153,7 +153,8 @@ class LibraryProfile(models.Model):
     user = models.OneToOneField(
         CustomUser,
         on_delete=models.CASCADE,
-        related_name='profile'
+        related_name='profile',
+        help_text= 'Related User'
     )
     member_since = models.DateField(
         auto_now_add=True
