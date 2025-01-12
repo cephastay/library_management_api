@@ -45,7 +45,7 @@ $ pip install -r requirements.txt
 
 _*Set up your database connection settings in the `.env` file*_
 
-- [Instructions in env_setup.md file]()
+- [Instructions in env_setup.md file](https://github.com/cephastay/library_management_api/blob/main/LMS/env_setup.md)
 
 _*Migrate the database*_
 ```bash
@@ -62,6 +62,6 @@ _*Start the Development Server*_
 $ python manage.py runserver
 ```
 
-The API should now be running at `https://enamyaovi.pythonanywhere.com`
+The API should now be running at `https://yourwebhost.com`  
 
-Check __Library_Project_ReadMe__ for overview of project
+Check [__Library_Project_ReadMe__](https://github.com/cephastay/library_management_api/blob/main/LMS/Library_Project_Readme.md) for overview of project
