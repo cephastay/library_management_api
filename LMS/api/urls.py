@@ -3,7 +3,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from rest_framework.authtoken.views import obtain_auth_token
 
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 
 from accounts import views
 from api import views as a_views
@@ -47,7 +47,8 @@ urlpatterns = [
     path('token/basic/', obtain_auth_token, name='basic_token'), 
     
     path('token/jwt/', TokenObtainPairView.as_view(), name='jwt_obtain_pair'), 
-    path('token/jwt/refresh/', TokenRefreshView.as_view(), name='jwt_refresh'),  # JWT token refresh
+    path('token/jwt/refresh/', TokenRefreshView.as_view(), name='jwt_refresh'),
+    path('token/jwt/verify/', TokenVerifyView.as_view(), name='jwt_verify'),
 
     # Custom book-related actions
     path('books/<int:pk>/return/', a_views.return_book, name='return_book'),

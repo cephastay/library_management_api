@@ -283,7 +283,14 @@ class TransactionHistoryViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         if self.request.user.is_staff:
             return self.queryset
+        elif self.request.user.is_authenticated:
+            return self.queryset.filter(user=self.request.user)
         return self.queryset.filter(user=self.request.user)
+    
+    def list(self, request, *args, **kwargs):
+        if self.request.user.is_anonymous:
+            return Response("Sorry Anonymous Users not Allowed", status=status.HTTP_401_UNAUTHORIZED)
+        return super().list(request, *args, **kwargs)
     
     @swagger_auto_schema(auto_schema=None)
     def retrieve(self, request, *args, **kwargs):
