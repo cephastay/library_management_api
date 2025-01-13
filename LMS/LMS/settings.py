@@ -49,6 +49,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware'
 ]
 
 ROOT_URLCONF = 'LMS.urls'
@@ -71,12 +72,16 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'LMS.wsgi.application'
 
+# Determine if using SQL DataBase
+SQL_Database = config('MySQL', default=False, cast= bool)
+
 # Database configuration based on environment
 if ENVIRONMENT == 'production':
     DATABASES = {
         'default': config('DATABASE_PRODUCTION', cast=db_url)
     }
-    DATABASES['default']['OPTIONS'] = {
+    if SQL_Database:
+        DATABASES['default']['OPTIONS'] = {
             'sql_mode': 'STRICT_TRANS_TABLES',
             }
 else:

@@ -6,18 +6,21 @@ cryptography==44.0.0
 defusedxml==0.8.0rc2
 dj-database-url==2.3.0
 Django==5.1.4
+django-case-insensitive-field==1.0.7
 django-fake-model==0.1.4
 django-filter==24.3
 djangorestframework==3.15.2
 djangorestframework_simplejwt==5.4.0
 djoser==2.3.1
 drf-yasg==1.21.8
+gunicorn==23.0.0
 idna==3.10
 inflection==0.5.1
 isbnlib==3.10.14
 mysqlclient==2.2.6
 oauthlib==3.2.2
 packaging==24.2
+psycopg2-binary==2.9.10
 pycparser==2.22
 PyJWT==2.10.1
 python-decouple==3.8
@@ -32,3 +35,4 @@ sqlparse==0.5.3
 typing_extensions==4.12.2
 uritemplate==4.1.1
 urllib3==2.3.0
+whitenoise==6.8.2
