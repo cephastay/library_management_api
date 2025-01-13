@@ -76,6 +76,9 @@ if ENVIRONMENT == 'production':
     DATABASES = {
         'default': config('DATABASE_PRODUCTION', cast=db_url)
     }
+    DATABASES['default']['OPTIONS'] = {
+            'sql_mode': 'STRICT_TRANS_TABLES',
+            }
 else:
     DATABASES = {
         'default': config('DATABASE_DEVELOPMENT', cast=db_url)
@@ -171,16 +174,15 @@ SWAGGER_SETTINGS = {
 }
 
 # Added security settings for mock project
-SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
-SECURE_BROWSER_XSS_FILTER = True
-X_FRAME_OPTIONS = 'DENY'
-SECURE_CONTENT_TYPE_NOSNIFF = True
-# 
-if ENVIRONMENT == 'production':  # Ensure the string is correctly closed
     # ONLY USE IN DEPLOYMENT
+if ENVIRONMENT == 'production':  
+    SESSION_COOKIE_SECURE = True
+    SECURE_SSL_REDIRECT = True
+    SECURE_BROWSER_XSS_FILTER = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = 'DENY'
     SECURE_HSTS_SECONDS = 31536000  # 1 year
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True  # Include subdomains in HSTS
-    SECURE_HSTS_PRELOAD = True  # Allow site to be preloaded by browsers
-    # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')  # Correct tuple format
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True  
+    SECURE_HSTS_PRELOAD = True  
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https') 

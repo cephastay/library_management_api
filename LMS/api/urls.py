@@ -17,16 +17,12 @@ schema_view = get_schema_view(
       title="Library Management System API",
       default_version='v1',
       description="An API to manage Books in a Library",
-      terms_of_service="https://www.google.com/policies/terms/",
       contact=openapi.Contact(email="cephas.tay137@gmail.com"),
-      license=openapi.License(name="BSD License"),
    ),
    public=True,
    permission_classes=(permissions.AllowAny,),
    
 )
-
-
 
 # Initialize the router and register viewsets
 router = DefaultRouter()
@@ -37,25 +33,25 @@ router.register(r'checkout', a_views.CheckOutViewSet, basename='checkout')
 router.register(r'checkout_history', a_views.TransactionHistoryViewSet, basename='history')
 
 urlpatterns = [
-    # API routes from the router
-    path('', include(router.urls)),
+   # API routes from the router
+   path('', include(router.urls)),
 
-    # Standalone API endpoints
-    path('endpoints/', a_views.endpoints, name='endpoints'),
+   # Standalone API endpoints
+   path('endpoints/', a_views.endpoints, name='endpoints'),
 
-    # Token obtain routes
-    path('token/basic/', obtain_auth_token, name='basic_token'), 
-    
-    path('token/jwt/', TokenObtainPairView.as_view(), name='jwt_obtain_pair'), 
-    path('token/jwt/refresh/', TokenRefreshView.as_view(), name='jwt_refresh'),
-    path('token/jwt/verify/', TokenVerifyView.as_view(), name='jwt_verify'),
+   # Token obtain routes
+   path('token/basic/', obtain_auth_token, name='basic_token'), 
+   
+   path('token/jwt/', TokenObtainPairView.as_view(), name='jwt_obtain_pair'), 
+   path('token/jwt/refresh/', TokenRefreshView.as_view(), name='jwt_refresh'),
+   path('token/jwt/verify/', TokenVerifyView.as_view(), name='jwt_verify'),
 
-    # Custom book-related actions
-    path('books/<int:pk>/return/', a_views.return_book, name='return_book'),
-    path('books/<int:pk>/checkout/', a_views.borrow_book, name='borrow_book'),
+   # Custom book-related actions
+   path('books/<int:pk>/return/', a_views.return_book, name='return_book'),
+   path('books/<int:pk>/checkout/', a_views.borrow_book, name='borrow_book'),
 
-    #swagger docs
-    path('swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
-    path('docs/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+   #swagger docs
+   path('swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
+   path('docs/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+   path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]
