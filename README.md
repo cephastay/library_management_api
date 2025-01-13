@@ -24,9 +24,10 @@ This repository contains all the resources and code for the project:
 
 ### General Overview: 
 This README provides a summary of the project.
-Check out [**API-Specific Documentation**]() for detailed instructions on 
+Check out [**API-Specific Documentation**](https://github.com/cephastay/library_management_api/blob/main/LMS/api_Readme.md)
+for detailed instructions on 
 using the LMS API, navigate to the _**LMS/api/api_Readme.md**_ directory and 
-refer to the project-specific README file.
+refer to the project-specific README file. The available endpoints are also here [api_endpoints.md](https://github.com/cephastay/library_management_api/blob/main/LMS/api_endpoints.md)
 
 ### Acknowledgments
 Special thanks to all my ALX Cohort 2 peers and mentors. What would I have 
