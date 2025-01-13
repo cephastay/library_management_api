@@ -165,7 +165,7 @@ In this initial phase, I focused on setting up the foundational aspects of the p
 
 - #### **Deployment:**
     Although I successfully deployed the project on 
-    [PythonAnywhere](enamyaovi.pythonanywhere.com), I faced initial
+    [PythonAnywhere](https://enamyaovi.pythonanywhere.com/), I faced initial
     challenges with reading my environment variable file. My project
     relies on python-decouple to read values from my .env file, but the
     allowed hosts were not being read correctly. After hardcoding the
